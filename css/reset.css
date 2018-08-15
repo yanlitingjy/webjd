@@ -1,0 +1,39 @@
+@charset "utf-8";
+body{
+	font-family: '微软雅黑';
+	font-size: 12px;
+}
+/*清除块元素的空隙*/
+body,h1,h2,h3,h4,h5,h6,p,dl,dd,ul,ol,li,form,input,textarea,select,table,th,td{
+	margin:0;
+	padding:0;
+}
+a{
+	text-decoration: none;
+}
+ul,li,ol{
+	list-style: none;
+}
+img{
+	border:0;
+}
+input,a{
+	outline: none;
+}
+table{
+	border-collapse: collapse;
+}
+textarea{
+	resize:none;overflow: auto;
+}
+/*万能清除*/
+.clear{
+	zoom:1;
+}
+.clear:after{
+	content: '';
+	display: block;
+	clear:both;
+	height: 0;
+	visibility: hidden;
+};

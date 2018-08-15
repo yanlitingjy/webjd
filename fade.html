@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0">
+	<title>手指滑动</title>
+	<link rel="stylesheet" type="text/css" href="css/reset.css">
+	<link rel="stylesheet" type="text/css" href="css/fade.css">
+</head>
+<body>
+	<div class="carousel" id="carousel">
+		<div>
+			<ul>
+				<li><a href="#"><img src="img/0.png"/></a></li>
+				<li><a href="#"><img src="img/1.png"/></a></li>
+				<li><a href="#"><img src="img/2.png"/></a></li>
+				<li><a href="#"><img src="img/3.png"/></a></li>
+				<li><a href="#"><img src="img/4.png"/></a></li>
+			</ul>
+		</div>
+	</div>
+	<script type="text/javascript">
+	//找到相关元素
+	var carousel = document.getElementById('carousel');
+	var imgLis = document.querySelectorAll('#carousel li');
+
+	var now = 0;
+	var prev = 4;
+	var next = 1;
+	var clientWidth;
+	init();
+
+	function init(){
+		//获取屏幕宽度
+		clientWidth = document.documentElement.clientWidth;
+		//盒子的高度
+		carousel.style.height = 130*clientWidth/200+'px';
+
+		for(var i=0;i<imgLis.length;i++){
+			imgLis[i].style.webkitTransform = "translateX("+clientWidth+"px)";
+		}
+		imgLis[now].style.webkitTransform = "translateX(0px)";
+		imgLis[prev].style.webkitTransform = "translateX("+(-clientWidth)+"px)";
+		imgLis[next].style.webkitTransform = "translateX("+clientWidth+"px)";
+	}
+	
+	var timer = setInterval(function(){
+			showNext();
+		},3000);
+
+	function showNext(){
+		prev = now;
+		now = next;
+		next++;
+		if(next>4){
+			next = 0;
+		}
+
+		imgLis[next].style.transition = "none"; 
+
+		imgLis[next].style.webkitTransform = "translateX("+clientWidth+"px)";
+		imgLis[now].style.webkitTransform = "translateX(0px)";
+		imgLis[prev].style.webkitTransform = "translateX("+(-clientWidth)+"px)";
+
+		//过度
+		imgLis[prev].style.transition = "all 0.3s ease 0s";
+		imgLis[now].style.transition = "all 0.3s ease 0s";
+	}
+
+	var deltaX,startX,startTime;
+	carousel.addEventListener('touchstart',touchStartHandler,false);
+	carousel.addEventListener('touchmove',touchMoveHandler,false);
+	carousel.addEventListener('touchend',touchEndHandler,false);
+
+	function touchStartHandler(event){
+		event.preventDefault();
+		if(event.touches.length>1){
+			return ;
+		}
+		clearInterval(timer);
+
+		//记录偏移量
+		deltaX = event.touches[0].clientX;
+		startX = event.touches[0].clientX;
+		//去掉过度
+		imgLis[now].style.transition = "none";
+        imgLis[prev].style.transition = "none";
+        imgLis[next].style.transition = "none";
+
+        startTime = new Date();
+	}
+
+	function touchMoveHandler(event){
+		event.preventDefault();
+		if(event.touches.length>1){
+			return ;
+		}
+		clearInterval(timer);
+
+		//得到实时坐标
+
+		var clientX = event.touches[0].clientX;
+		imgLis[now].style.webkitTransform = "translateX("+(clientX-deltaX)+"px)";
+		imgLis[next].style.webkitTransform = "translateX("+(clientWidth+clientX-deltaX)+"px)";
+		imgLis[prev].style.webkitTransform = "translateX("+(-clientWidth+clientX-deltaX)+"px)"
+
+	}
+
+	function touchEndHandler(event){
+		event.preventDefault();
+		var distance = event.changedTouches[0].clientX-startX;
+		var time = new Date() - startTime;
+		if(distance>=clientWidth/2 || (distance>30&&time<300)){
+			next = now;
+			now = prev;
+			prev--;
+			if(prev<0){
+				prev=4;
+			}
+			imgLis[now].style.transition = "all 0.3s ease 0s";
+			imgLis[next].style.transition = "all 0.3s ease 0s";
+
+			imgLis[now].style.webkitTransform = "translateX(0px)";
+			imgLis[next].style.webkitTransform = "translateX("+clientWidth+"px)";
+		}else if(distance<-clientWidth/2 || (distance<-30&&time<300)){
+			showNext();
+		}else{
+			console.log("滑动不成功");
+
+			imgLis[now].style.transition = "all 0.3s ease 0s";
+			imgLis[next].style.transition = "all 0.3s ease 0s";
+			imgLis[prev].style.transition = "all 0.3s ease 0s";
+
+			imgLis[now].style.webkitTransform = "translateX(0px)";
+			imgLis[next].style.webkitTransform = "translateX("+clientWidth+"px)";
+			imgLis[prev].style.webkitTransform = "translateX("+(-clientWidth)+"px)";
+			}
+			clearInterval(timer);
+			timer = setInterval(function(){
+				showNext();
+			},3000);
+	}
+	</script>
+</body>
+</html>
